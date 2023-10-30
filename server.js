@@ -10,7 +10,7 @@ app.use(bodyParser.urlencoded({ limit: '500mb', extended: true, parameterLimit: 
 app.use(cors())
 // Other middleware and configurations
 
-app.post('/', (req, res) => {
+app.get('/', (req, res) => {
   res.send('hello')
 })
 
