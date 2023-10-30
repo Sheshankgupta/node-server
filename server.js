@@ -16,17 +16,17 @@ app.get('/', (req, res) => {
 
 app.post('/upload', (req, res) => {
   // Access the data array from the request body
-  const { data } = req.body;
+  // const { data } = req.body;
 
-  if (Array.isArray(data)) {
-    // If data is wrapped in an array, unwrap it
-    const formData = data;
-    console.log('Received formData:', formData);
-    // You can now work with the formData array
-  } else {
-    // Handle the case when data is not wrapped in an array
-    console.log('Received data:', data);
-  }
+  // if (Array.isArray(data)) {
+  //   // If data is wrapped in an array, unwrap it
+  //   const formData = data;
+  //   console.log('Received formData:', formData);
+  //   // You can now work with the formData array
+  // } else {
+  //   // Handle the case when data is not wrapped in an array
+  //   console.log('Received data:', data);
+  // }
 
   // Continue with your processing
 
