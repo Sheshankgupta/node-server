@@ -3,6 +3,7 @@ const app = express();
 const bodyParser = require('body-parser'); // Import body-parser
 const config = require('dotenv').config();
 const cors = require('cors')
+const tesseract = require('node-tesseract-ocr')
 
 // Set up body-parser middleware
 app.use(bodyParser.json({ limit: '500mb' }));
@@ -14,7 +15,7 @@ app.get('/', (req, res) => {
   res.send('hello')
 })
 
-app.post('/upload', (req, res) => {
+app.post('/upload', async (req, res) => {
   // Access the data array from the request body
   // const { data } = req.body;
 
@@ -30,8 +31,23 @@ app.post('/upload', (req, res) => {
 
   // Continue with your processing
 
+  // const imageArray = req.body;
+  // let base64Image = imageArray[0].split(';base64,').pop();
+  // const imgBuffer = Buffer.from(base64Image, 'base64')
+  // const text = await tesseract.recognize(imgBuffer)
+  // console.log(text)
+
   res.json({ message: 'Data received successfully', success: true, responseCode: 200 });
 });
+
+app.post('/image', async (req, res) => {
+  const image = req.body.data;
+  const id = req.body.id;
+  const base64Image = image.split(';base64,').pop();
+  const imgBuffer = Buffer.from(base64Image, 'base64');
+  const text = await tesseract.recognize(imgBuffer);
+  res.json({ id: id, text: text, message: 'image decoded successfully', });
+})
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
