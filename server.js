@@ -3,7 +3,8 @@ const app = express();
 const bodyParser = require('body-parser'); // Import body-parser
 const config = require('dotenv').config();
 const cors = require('cors')
-const tesseract = require('node-tesseract-ocr')
+// const tesseract = require('node-tesseract-ocr')
+const { createWorker } = require('tesseract.js');
 
 // Set up body-parser middleware
 app.use(bodyParser.json({ limit: '500mb' }));
@@ -45,7 +46,13 @@ app.post('/image', async (req, res) => {
   const id = req.body.id;
   const base64Image = image.split(';base64,').pop();
   const imgBuffer = Buffer.from(base64Image, 'base64');
-  const text = await tesseract.recognize(imgBuffer);
+  // const text = await tesseract.recognize(imgBuffer);
+  const worker = await createWorker('eng');
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+  const { data: { text } } = await worker.recognize(imgBuffer);
+  await worker.terminate();
+
   res.json({ id: id, text: text, message: 'image decoded successfully', });
 })
 
