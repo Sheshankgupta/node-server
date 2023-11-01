@@ -6,6 +6,14 @@ const cors = require('cors')
 // const tesseract = require('node-tesseract-ocr')
 const { createWorker } = require('tesseract.js');
 
+let worker;
+
+(async () => {
+  worker = await createWorker('eng');
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+})();
+
 // Set up body-parser middleware
 app.use(bodyParser.json({ limit: '500mb' }));
 app.use(bodyParser.urlencoded({ limit: '500mb', extended: true, parameterLimit: 50000 }));
@@ -47,11 +55,7 @@ app.post('/image', async (req, res) => {
   const base64Image = image.split(';base64,').pop();
   const imgBuffer = Buffer.from(base64Image, 'base64');
   // const text = await tesseract.recognize(imgBuffer);
-  const worker = await createWorker('eng');
-  await worker.loadLanguage('eng');
-  await worker.initialize('eng');
   const { data: { text } } = await worker.recognize(imgBuffer);
-  await worker.terminate();
 
   res.json({ id: id, text: text, message: 'image decoded successfully', });
 })
