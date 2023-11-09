@@ -55,14 +55,11 @@ app.post('/image', async (req, res) => {
   const base64Image = image.split(';base64,').pop();
   const imgBuffer = Buffer.from(base64Image, 'base64');
   // const text = await tesseract.recognize(imgBuffer);
-  try {
-    const { data: { text } } = await worker.recognize(imgBuffer);
-    res.json({ id: id, text: text, success: true, message: 'image decoded successfully', });
-
-  } catch (e) {
+  worker.recognize(imgBuffer).then((data) => {
+    res.json({ id: id, text: data.text, success: true, message: 'image decoded successfully', });
+  }).catch((e) => {
     res.json({ success: false, id: id, text: '', message: 'image could not be decoded', });
-  }
-
+  });
 })
 
 const PORT = process.env.PORT || 3000;
