@@ -6,13 +6,13 @@ const cors = require('cors')
 // const tesseract = require('node-tesseract-ocr')
 const { createWorker } = require('tesseract.js');
 
-// let worker;
+let worker;
 
-// (async () => {
-//   worker = await createWorker('eng');
-//   await worker.loadLanguage('eng');
-//   await worker.initialize('eng');
-// })();
+(async () => {
+  worker = await createWorker('eng');
+  await worker.loadLanguage('eng');
+  await worker.initialize('eng');
+})();
 
 // Set up body-parser middleware
 app.use(bodyParser.json({ limit: '500mb' }));
@@ -54,6 +54,21 @@ app.post('/image', async (req, res) => {
   const id = req.body.id;
   const base64Image = image.split(';base64,').pop();
   const imgBuffer = Buffer.from(base64Image, 'base64');
+  // const text = await tesseract.recognize(imgBuffer);
+  try {
+    const { data: { text } } = await worker.recognize(imgBuffer);
+    res.json({ id: id, text: text, success: true, message: 'image decoded successfully', });
+
+  } catch (e) {
+    res.json({ success: false, id: id, text: '', message: 'image could not be decoded', });
+  }
+})
+
+app.post('/fasttrack', async (req, res) => {
+  const image = req.body.data;
+  const id = req.body.id;
+  const base64Image = image.split(';base64,').pop();
+  const imgBuffer = Buffer.from(base64Image, 'base64');
 
   const worker = await createWorker('eng');
   await worker.loadLanguage('eng');
@@ -67,11 +82,9 @@ app.post('/image', async (req, res) => {
   }
   finally {
     worker.terminate();
-
   }
 
 })
-
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);
